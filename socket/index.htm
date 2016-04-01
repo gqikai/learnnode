@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+<form id="testForm">
+	<p>名称：<input type="text" id="username"/></p>
+	<p>内容：<input type="text" id="msg"/></p>
+	<p><input type="submit"/></p>
+	<p><input type="button" value="关闭socket" id="close"/></p>
+</form>
+<div id="systemInfo"></div>
+<script type="text/javascript">
+	var $ = function(id){
+		return document.getElementById(id);
+	}
+	var testForm = $('testForm'), username = $('username'), msg = $('msg'), systemInfo = $('systemInfo'), close = $('close');
+
+	var ws = new WebSocket('ws://127.0.0.1:8808/');
+	
+	//建立服务器连接
+	ws.onopen = function(){
+		systemInfo.innerHTML = '<p>和websocket服务器连接成功</p>';
+	}
+	//接收到服务器返回的数据
+	ws.onmessage = function(e){
+		systemInfo.innerHTML += '<p>'+e.data+'</p>';
+	}
+
+	//断开服务器连接
+	ws.onclose = function(){
+		systemInfo.innerHTML += '<p>WebSocket服务器连接关闭</p>';
+	}
+
+	//ws发生错误
+	ws.onerror = function(e){
+		console.log(e);
+		systemInfo.innerHTML += '<p>WebSocket发生错误</p>';
+	}
+
+	testForm.onsubmit = function(){
+		//发送数据给服务器
+		ws.send(username.value+":"+msg.value);
+		return false;
+	}
+	close.addEventListener('click', function(){
+		ws.close();
+	}, false);
+</script>
+</body>
+</html>
